@@ -5,6 +5,7 @@ from datetime import datetime
 class Usuario:
     nome: str
     email: str
+    senha: str  # Novo campo para senha
 
 @dataclass
 class Comentario:
@@ -28,13 +29,28 @@ def cadastrar_usuario():
     print("\n=== CADASTRAR USUÁRIO ===")
     nome = input("Digite o nome de usuário: ")
     email = input("Digite o email: ")
+    senha = input("Digite a senha (mínimo 6 caracteres): ")
+    
+    # Validação da senha
+    if len(senha) < 6:
+        print("A senha deve ter pelo menos 6 caracteres.")
+        return None
+    
     if any(u.nome == nome for u in lista_usuarios):
         print("Usuário já existe.")
         return None
-    usuario = Usuario(nome, email)
+    
+    usuario = Usuario(nome, email, senha)
     lista_usuarios.append(usuario)
     print("Usuário cadastrado com sucesso!")
     return usuario
+
+def verificar_senha(autor, senha):
+    """Verifica se a senha está correta para o usuário."""
+    for usuario in lista_usuarios:
+        if usuario.nome == autor and usuario.senha == senha:
+            return True
+    return False
 
 def criar_publicacao():
     print("\n=== CRIAR PUBLICAÇÃO ===")
@@ -45,6 +61,13 @@ def criar_publicacao():
     if not any(u.nome == autor for u in lista_usuarios):
         print("Usuário não cadastrado.")
         return
+    
+    # Verificar senha antes de criar publicação
+    senha = input("Digite sua senha: ")
+    if not verificar_senha(autor, senha):
+        print("Senha incorreta.")
+        return
+    
     conteudo = input("Digite o conteúdo da publicação: ")
     descricao = input("Digite a descrição: ")
     data_hora = datetime.now()
@@ -61,6 +84,15 @@ def curtir_publicacao():
     try:
         indice = int(input("Digite o número da publicação para curtir: ")) - 1
         if 0 <= indice < len(lista_publicacoes):
+            autor = input("Digite seu nome de usuário: ")
+            if not any(u.nome == autor for u in lista_usuarios):
+                print("Usuário não cadastrado.")
+                return
+            # Verificar senha antes de curtir
+            senha = input("Digite sua senha: ")
+            if not verificar_senha(autor, senha):
+                print("Senha incorreta.")
+                return
             pub = lista_publicacoes[indice]
             pub.curtidas += 1
             print("Publicação curtida!")
@@ -78,14 +110,19 @@ def comentar_publicacao():
     try:
         indice = int(input("Digite o número da publicação para comentar: ")) - 1
         if 0 <= indice < len(lista_publicacoes):
-            pub = lista_publicacoes[indice]
             autor = input("Digite seu nome de usuário: ")
             if not any(u.nome == autor for u in lista_usuarios):
                 print("Usuário não cadastrado.")
                 return
+            # Verificar senha antes de comentar
+            senha = input("Digite sua senha: ")
+            if not verificar_senha(autor, senha):
+                print("Senha incorreta.")
+                return
             texto = input("Digite o comentário: ")
             data_hora = datetime.now()
             comentario = Comentario(autor, texto, data_hora)
+            pub = lista_publicacoes[indice]
             pub.comentarios.append(comentario)
             print("Comentário adicionado!")
         else:
