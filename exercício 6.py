@@ -113,3 +113,21 @@ def menu():
             print("[ERRO] Opção inválida, tente novamente.")
 
 menu()
+
+
+
+
+diagrama: 
+flowchart TD
+    A[Cliente] -->|Solicita orçamento| B[Adicionar Reparo]
+    A -->|Consulta andamento| C[Consultar Status]
+    A -->|Retira equipamento| F[Fim do serviço]
+
+    D[Técnico] -->|Executa serviço| B
+    D -->|Atualiza progresso| E[Atualizar Status]
+    D -->|Vende peça| G[Vender Peça]
+    D -->|Gera relatório| H[Gerar Relatório]
+
+    B --> E
+    E --> C
+    G --> H
